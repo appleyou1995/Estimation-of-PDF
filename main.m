@@ -620,53 +620,66 @@ set([h1 h2 h3 h4], ...
 clear h1 h2 h3 h4
 
 
-%% Power Utility Function (first derivative)
+%% Setting Numerator with Different Gamma
 
-function U_prime = power_utility_prime(z, gamma)
-
-U_prime = z.^ (-gamma);
-
-end
-
-
-%% 
-
-numerator = Smooth_AllK .* Smooth_RND;
+gamma_1 = Smooth_AllK .^ 1 .* Smooth_RND;
+gamma_2 = Smooth_AllK .^ 2 .* Smooth_RND;
+gamma_3 = Smooth_AllK .^ 3 .* Smooth_RND;
+gamma_4 = Smooth_AllK .^ 4 .* Smooth_RND;
 
 
-%% ST_times_Q
+%% Real-World Densities
 
-function result = ST_times_Q(A, B, x)
-    % 查找 x 在向量 A 中的索引
-    index = find(A == x);
-    
-    % 確認 x 是否存在於 Smooth_AllK 中
-    if isempty(index)
-        error('out of Smooth_AllK');
-    end
-    
-    % 確認 index 是否超出 Smooth_RND 的範圍
-    if index > length(B)
-        error('out of Smooth_RND');
-    end
-    
-    % 回傳結果
-    result = A(index) * B(index);
-end
+P_Density_gamma_1 = gamma_1 ./ trapz(Smooth_AllK, gamma_1);
+P_Density_gamma_2 = gamma_2 ./ trapz(Smooth_AllK, gamma_2);
+P_Density_gamma_3 = gamma_3 ./ trapz(Smooth_AllK, gamma_3);
+P_Density_gamma_4 = gamma_4 ./ trapz(Smooth_AllK, gamma_4);
 
 
-%% test
+%% Plot Figure: Physical Density (Full Density)
 
-A = Smooth_AllK;
-B = Smooth_RND;
+figure;
+plot(Smooth_AllK, P_Density_gamma_1, '-', 'LineWidth', 2);
+hold on;
+plot(Smooth_AllK, P_Density_gamma_2, '-', 'LineWidth', 2);
+plot(Smooth_AllK, P_Density_gamma_3, '-', 'LineWidth', 2);
+plot(Smooth_AllK, P_Density_gamma_4, '-', 'LineWidth', 2);
+hold off;
 
-result = ST_times_Q(A, B, Smooth_AllK(10));
+set(gca,'XTick', min(Smooth_AllK):100:max(Smooth_AllK));
+xlim([min(Smooth_AllK) max(Smooth_AllK)]);
+grid on
 
-% 顯示結果
-disp(result);
+h1 = title(['Full Physical Density Function (Date = ' datestr(datenum(num2str(Target_Date), 'yyyymmdd'), 'mmm dd, yyyy') ', Time to Maturity = ' num2str(Target_TTM) ' Days)']);
+h2 = legend('gamma=1', 'gamma=2', 'gamma=3', 'gamma=4');
+h3 = xlabel('Level of S&P 500 Index');
+h4 = ylabel('Density');
+
+set([h1 h2 h3 h4], ...
+    'FontSize', 14, ...
+    'FontWeight', 'bold', ...
+    'LineWidth', 2)
+clear h1 h2 h3 h4
 
 
-%% 
+%% Calculate Statistical Moments of Return
 
-integrant = @(x) ST_times_Q(Smooth_AllK, Smooth_RND, x);
-result = integral(integrant, min(Smooth_AllK), max(Smooth_AllK),'ArrayValued',true);
+S_t = Data(1, Index_S);
+S_T = Smooth_AllK;
+R_T = S_T / S_t;
+
+gamma_1_mean = trapz(Smooth_AllK, R_T .* P_Density_gamma_1);
+gamma_1_square_mean = trapz(Smooth_AllK, R_T .^ 2 .* P_Density_gamma_1);
+gamma_1_variance = gamma_1_square_mean - gamma_1_mean ^ 2;
+
+gamma_2_mean = trapz(Smooth_AllK, R_T .* P_Density_gamma_2);
+gamma_2_square_mean = trapz(Smooth_AllK, R_T .^ 2 .* P_Density_gamma_2);
+gamma_2_variance = gamma_2_square_mean - gamma_2_mean ^ 2;
+
+gamma_3_mean = trapz(Smooth_AllK, R_T .* P_Density_gamma_3);
+gamma_3_square_mean = trapz(Smooth_AllK, R_T .^ 2 .* P_Density_gamma_3);
+gamma_3_variance = gamma_3_square_mean - gamma_3_mean ^ 2;
+
+gamma_4_mean = trapz(Smooth_AllK, R_T .* P_Density_gamma_4);
+gamma_4_square_mean = trapz(Smooth_AllK, R_T .^ 2 .* P_Density_gamma_4);
+gamma_4_variance = gamma_4_square_mean - gamma_4_mean ^ 2;

@@ -43,15 +43,15 @@ Index_DY = Index_Vega + 2;
 
 
 % Specific Data
-Index = find((Data(:, Index_Date)==Target_Date) & ...
-             (Data(:, Index_TTM) >= Target_TTM));
+Index = (Data(:, Index_Date)==Target_Date) & ...
+        (Data(:, Index_TTM) >= Target_TTM);
 Data = Data(Index, :);                                                     % Update: Data
 clear Index
 
 % Specific Time-to-Maturity 
 Target_TTM = min(Data(:, Index_TTM));                                      % Update: Target_TTM
 
-Index = find(Data(:, Index_TTM)==Target_TTM);
+Index = Data(:, Index_TTM)==Target_TTM;
 Data = Data(Index, :);                                                     % Update: Data
 clear Index
 
@@ -59,10 +59,10 @@ clear Index
 %% Correction of Expiration Date (Time-to-Maturity)
 
 % Saturday to Friday
-Date_EXP_WeekDay = weekday(datenum(num2str(Data(:, Index_Date)), 'yyyymmdd') ...
-                           + Data(:, Index_TTM));      
-Data(Date_EXP_WeekDay==7, Index_TTM) = Data(Date_EXP_WeekDay==7, Index_TTM) - 1;   % Update: Data    
-clear Date_EXP_WeekDay            
+dateTime = datetime(num2str(Data(:, Index_Date)), 'InputFormat', 'yyyyMMdd');
+Date_EXP_WeekDay = weekday(dateTime + days(Data(:, Index_TTM)));
+Data(Date_EXP_WeekDay==7, Index_TTM) = Data(Date_EXP_WeekDay==7, Index_TTM) - 1;   % Update: Data
+clear Date_EXP_WeekDay       
     
 % AM Settlement
 % Calculation of Risk-Free Rate and Implied Volatility (IvyDB Reference Manual) 
@@ -74,27 +74,29 @@ Target_TTM = Data(1, Index_TTM);
 %% Data Filtering
 
 % Bid >= 0.375
-Index = find(Data(:, Index_OP_Bid) >= 0.375);
-Data = Data(Index, :);                                                     % Update: Data
+Index = Data(:, Index_OP_Bid) >= 0.375;
+Data2 = Data(Index, :);
+
 clear Index
 
+%% 
 
 % Out-of-the-Money (OTM) and Around At-the-Money (ATM) Options
-Index = find((Data(:, Index_CPFlag)==1) & ...
-             (Data(:, Index_K) >= (Data(:, Index_S))) & ...
-             (Data(:, Index_K) <= (Data(:, Index_S))));
+Index = (Data(:, Index_CPFlag) == 1) & ...
+        (Data(:, Index_K) >= Data(:, Index_S)) & ...
+        (Data(:, Index_K) <= Data(:, Index_S));
 Data(Index, Index_CPFlag) = 31;                                            % Update: Data (CP Flag)           
 clear Index
 
-Index = find((Data(:, Index_CPFlag)==2) & ...
-             (Data(:, Index_K) >= (Data(:, Index_S))) & ...
-             (Data(:, Index_K) <= (Data(:, Index_S))));
+Index = (Data(:, Index_CPFlag)==2) & ...
+        (Data(:, Index_K) >= (Data(:, Index_S))) & ...
+        (Data(:, Index_K) <= (Data(:, Index_S)));
 Data(Index, Index_CPFlag) = 32;                                            % Update: Data (CP Flag)           
 clear Index
           
-Index = find(((Data(:, Index_CPFlag)==1) & (Data(:, Index_K) >= Data(:, Index_S))) | ...
-             ((Data(:, Index_CPFlag)==2) & (Data(:, Index_K) <= Data(:, Index_S))) | ...
-             (fix(Data(:, Index_CPFlag) / 10)==3));      
+Index = ((Data(:, Index_CPFlag)==1) & (Data(:, Index_K) >= Data(:, Index_S))) | ...
+        ((Data(:, Index_CPFlag)==2) & (Data(:, Index_K) <= Data(:, Index_S))) | ...
+        (fix(Data(:, Index_CPFlag) / 10)==3);      
 Data = Data(Index, :);                                                     % Update: Data 
 clear Index 
 
@@ -103,7 +105,7 @@ clear Index
 
 % [1. SecID | 2. Date (YYYYMMDD) | 3. Dividend Yield (Annualized)]
 
-FileName = ['IndexDivYield19962019.txt'];
+FileName = 'IndexDivYield19962019.txt';
 Data_DY = load(['D:\Google\我的雲端硬碟\學術｜研究與論文\論文著作\CDI Method\Data\99 姿穎學姊提供\20240417\' FileName]);
 clear FileName
 
@@ -115,7 +117,7 @@ Data(:, Index_DY) = Data_DY(Data_DY(:, Index_Date)==Target_Date, end);     % Ann
 
 % [1. Date (YYYYMMDD) | 2. TTM (Days) | 3. Risk-Free Rate (Annualized)]
 
-FileName = ['RiskFreeRate19962019.txt'];
+FileName = 'RiskFreeRate19962019.txt';
 Data_RF = load(['D:\Google\我的雲端硬碟\學術｜研究與論文\論文著作\CDI Method\Data\99 姿穎學姊提供\20240417\' FileName]);
 clear FileName
 
@@ -616,3 +618,55 @@ set([h1 h2 h3 h4], ...
     'FontWeight', 'bold', ...
     'LineWidth', 2)
 clear h1 h2 h3 h4
+
+
+%% Power Utility Function (first derivative)
+
+function U_prime = power_utility_prime(z, gamma)
+
+U_prime = z.^ (-gamma);
+
+end
+
+
+%% 
+
+numerator = Smooth_AllK .* Smooth_RND;
+
+
+%% ST_times_Q
+
+function result = ST_times_Q(A, B, x)
+    % 查找 x 在向量 A 中的索引
+    index = find(A == x);
+    
+    % 確認 x 是否存在於 Smooth_AllK 中
+    if isempty(index)
+        error('out of Smooth_AllK');
+    end
+    
+    % 確認 index 是否超出 Smooth_RND 的範圍
+    if index > length(B)
+        error('out of Smooth_RND');
+    end
+    
+    % 回傳結果
+    result = A(index) * B(index);
+end
+
+
+%% test
+
+A = Smooth_AllK;
+B = Smooth_RND;
+
+result = ST_times_Q(A, B, Smooth_AllK(10));
+
+% 顯示結果
+disp(result);
+
+
+%% 
+
+integrant = @(x) ST_times_Q(Smooth_AllK, Smooth_RND, x);
+result = integral(integrant, min(Smooth_AllK), max(Smooth_AllK),'ArrayValued',true);

@@ -934,22 +934,111 @@ S_t = Data(1, Index_S);
 S_T = Smooth_AllK;
 R_T = S_T / S_t;
 
-RND_mean = trapz(Smooth_AllK, R_T .* Smooth_RND);
-RND_square_mean = trapz(Smooth_AllK, R_T .^ 2 .* Smooth_RND);
-RND_variance = RND_square_mean - RND_mean ^ 2;
+RND_mean     = trapz(Smooth_AllK, R_T .* Smooth_RND);
+RND_variance = trapz(Smooth_AllK, ((R_T - RND_mean) .^ 2) .* Smooth_RND);
+RND_std_dev  = sqrt(RND_variance);
+RND_skewness = trapz(Smooth_AllK, (((R_T - RND_mean) / RND_std_dev) .^ 3) .* Smooth_RND);
+RND_kurtosis = trapz(Smooth_AllK, (((R_T - RND_mean) / RND_std_dev) .^ 4) .* Smooth_RND) - 3;
 
-gamma_1_mean = trapz(Smooth_AllK, R_T .* P_Density_gamma_1);
-gamma_1_square_mean = trapz(Smooth_AllK, R_T .^ 2 .* P_Density_gamma_1);
-gamma_1_variance = gamma_1_square_mean - gamma_1_mean ^ 2;
 
-gamma_2_mean = trapz(Smooth_AllK, R_T .* P_Density_gamma_2);
-gamma_2_square_mean = trapz(Smooth_AllK, R_T .^ 2 .* P_Density_gamma_2);
-gamma_2_variance = gamma_2_square_mean - gamma_2_mean ^ 2;
+%%  [Negative Exponential Utility]
 
-gamma_3_mean = trapz(Smooth_AllK, R_T .* P_Density_gamma_3);
-gamma_3_square_mean = trapz(Smooth_AllK, R_T .^ 2 .* P_Density_gamma_3);
-gamma_3_variance = gamma_3_square_mean - gamma_3_mean ^ 2;
+% alpha = 0.01
+alpha_1_mean     = trapz(Smooth_AllK, R_T .* P_Density_alpha_1);
+alpha_1_variance = trapz(Smooth_AllK, ((R_T - alpha_1_mean) .^ 2) .* P_Density_alpha_1);
+alpha_1_std_dev  = sqrt(alpha_1_variance);
+alpha_1_skewness = trapz(Smooth_AllK, (((R_T - alpha_1_mean) / alpha_1_std_dev) .^ 3) .* P_Density_alpha_1);
+alpha_1_kurtosis = trapz(Smooth_AllK, (((R_T - alpha_1_mean) / alpha_1_std_dev) .^ 4) .* P_Density_alpha_1) - 3;
 
-gamma_4_mean = trapz(Smooth_AllK, R_T .* P_Density_gamma_4);
-gamma_4_square_mean = trapz(Smooth_AllK, R_T .^ 2 .* P_Density_gamma_4);
-gamma_4_variance = gamma_4_square_mean - gamma_4_mean ^ 2;
+
+% alpha = 0.02
+alpha_2_mean     = trapz(Smooth_AllK, R_T .* P_Density_alpha_2);
+alpha_2_variance = trapz(Smooth_AllK, ((R_T - alpha_2_mean) .^ 2) .* P_Density_alpha_2);
+alpha_2_std_dev  = sqrt(alpha_2_variance);
+alpha_2_skewness = trapz(Smooth_AllK, (((R_T - alpha_2_mean) / alpha_2_std_dev) .^ 3) .* P_Density_alpha_2);
+alpha_2_kurtosis = trapz(Smooth_AllK, (((R_T - alpha_2_mean) / alpha_2_std_dev) .^ 4) .* P_Density_alpha_2) - 3;
+
+
+% alpha = 0.03
+alpha_3_mean     = trapz(Smooth_AllK, R_T .* P_Density_alpha_3);
+alpha_3_variance = trapz(Smooth_AllK, ((R_T - alpha_3_mean) .^ 2) .* P_Density_alpha_3);
+alpha_3_std_dev  = sqrt(alpha_3_variance);
+alpha_3_skewness = trapz(Smooth_AllK, (((R_T - alpha_3_mean) / alpha_3_std_dev) .^ 3) .* P_Density_alpha_3);
+alpha_3_kurtosis = trapz(Smooth_AllK, (((R_T - alpha_3_mean) / alpha_3_std_dev) .^ 4) .* P_Density_alpha_3) - 3;
+
+
+% alpha = 0.04
+alpha_4_mean     = trapz(Smooth_AllK, R_T .* P_Density_alpha_4);
+alpha_4_variance = trapz(Smooth_AllK, ((R_T - alpha_4_mean) .^ 2) .* P_Density_alpha_4);
+alpha_4_std_dev  = sqrt(alpha_4_variance);
+alpha_4_skewness = trapz(Smooth_AllK, (((R_T - alpha_4_mean) / alpha_4_std_dev) .^ 3) .* P_Density_alpha_4);
+alpha_4_kurtosis = trapz(Smooth_AllK, (((R_T - alpha_4_mean) / alpha_4_std_dev) .^ 4) .* P_Density_alpha_4) - 3;
+
+
+%%  [Power Utility]
+
+% gamma = 1
+gamma_1_mean     = trapz(Smooth_AllK, R_T .* P_Density_gamma_1);
+gamma_1_variance = trapz(Smooth_AllK, ((R_T - gamma_1_mean) .^ 2) .* P_Density_gamma_1);
+gamma_1_std_dev  = sqrt(gamma_1_variance);
+gamma_1_skewness = trapz(Smooth_AllK, (((R_T - gamma_1_mean) / gamma_1_std_dev) .^ 3) .* P_Density_gamma_1);
+gamma_1_kurtosis = trapz(Smooth_AllK, (((R_T - gamma_1_mean) / gamma_1_std_dev) .^ 4) .* P_Density_gamma_1) - 3;
+
+
+% gamma = 2
+gamma_2_mean     = trapz(Smooth_AllK, R_T .* P_Density_gamma_2);
+gamma_2_variance = trapz(Smooth_AllK, ((R_T - gamma_2_mean) .^ 2) .* P_Density_gamma_2);
+gamma_2_std_dev  = sqrt(gamma_2_variance);
+gamma_2_skewness = trapz(Smooth_AllK, (((R_T - gamma_2_mean) / gamma_2_std_dev) .^ 3) .* P_Density_gamma_2);
+gamma_2_kurtosis = trapz(Smooth_AllK, (((R_T - gamma_2_mean) / gamma_2_std_dev) .^ 4) .* P_Density_gamma_2) - 3;
+
+
+% gamma = 3
+gamma_3_mean     = trapz(Smooth_AllK, R_T .* P_Density_gamma_3);
+gamma_3_variance = trapz(Smooth_AllK, ((R_T - gamma_3_mean) .^ 2) .* P_Density_gamma_3);
+gamma_3_std_dev  = sqrt(gamma_3_variance);
+gamma_3_skewness = trapz(Smooth_AllK, (((R_T - gamma_3_mean) / gamma_3_std_dev) .^ 3) .* P_Density_gamma_3);
+gamma_3_kurtosis = trapz(Smooth_AllK, (((R_T - gamma_3_mean) / gamma_3_std_dev) .^ 4) .* P_Density_gamma_3) - 3;
+
+
+% gamma = 4
+gamma_4_mean     = trapz(Smooth_AllK, R_T .* P_Density_gamma_4);
+gamma_4_variance = trapz(Smooth_AllK, ((R_T - gamma_4_mean) .^ 2) .* P_Density_gamma_4);
+gamma_4_std_dev  = sqrt(gamma_4_variance);
+gamma_4_skewness = trapz(Smooth_AllK, (((R_T - gamma_4_mean) / gamma_4_std_dev) .^ 3) .* P_Density_gamma_4);
+gamma_4_kurtosis = trapz(Smooth_AllK, (((R_T - gamma_4_mean) / gamma_4_std_dev) .^ 4) .* P_Density_gamma_4) - 3;
+
+
+%%  Summary
+
+Summary_table = table(...
+    [RND_mean; alpha_1_mean; alpha_2_mean; alpha_3_mean; alpha_4_mean; gamma_1_mean; gamma_2_mean; gamma_3_mean; gamma_4_mean], ...
+    [RND_variance; alpha_1_variance; alpha_2_variance; alpha_3_variance; alpha_4_variance; gamma_1_variance; gamma_2_variance; gamma_3_variance; gamma_4_variance], ...
+    [RND_skewness; alpha_1_skewness; alpha_2_skewness; alpha_3_skewness; alpha_4_skewness; gamma_1_skewness; gamma_2_skewness; gamma_3_skewness; gamma_4_skewness], ...
+    [RND_kurtosis; alpha_1_kurtosis; alpha_2_kurtosis; alpha_3_kurtosis; alpha_4_kurtosis; gamma_1_kurtosis; gamma_2_kurtosis; gamma_3_kurtosis; gamma_4_kurtosis], ...
+    'VariableNames', {'Mean', 'Variance', 'Skewness', 'Kurtosis'}, ...
+    'RowNames', {'RND', 'alpha = 0.01', 'alpha = 0.02', 'alpha = 0.03', 'alpha = 0.04', 'gamma = 1', 'gamma = 2', 'gamma = 3', 'gamma = 4'});
+
+disp(Summary_table);
+
+writetable(Summary_table, 'Summary_table.csv', 'WriteRowNames', true);
+
+
+%%    Summary
+
+Summary_table_T = table(...
+    [RND_mean;     RND_variance;     RND_skewness;     RND_kurtosis    ], ...
+    [alpha_1_mean; alpha_1_variance; alpha_1_skewness; alpha_1_kurtosis], ...
+    [alpha_2_mean; alpha_2_variance; alpha_2_skewness; alpha_2_kurtosis], ...
+    [alpha_3_mean; alpha_3_variance; alpha_3_skewness; alpha_3_kurtosis], ...
+    [alpha_4_mean; alpha_4_variance; alpha_4_skewness; alpha_4_kurtosis], ...
+    [gamma_1_mean; gamma_1_variance; gamma_1_skewness; gamma_1_kurtosis], ...
+    [gamma_2_mean; gamma_2_variance; gamma_2_skewness; gamma_2_kurtosis], ...
+    [gamma_3_mean; gamma_3_variance; gamma_3_skewness; gamma_3_kurtosis], ...
+    [gamma_4_mean; gamma_4_variance; gamma_4_skewness; gamma_4_kurtosis], ...
+    'RowNames', {'Mean', 'Variance', 'Skewness', 'Kurtosis'}, ...
+    'VariableNames', {'RND', 'alpha = 0.01', 'alpha = 0.02', 'alpha = 0.03', 'alpha = 0.04', 'gamma = 1', 'gamma = 2', 'gamma = 3', 'gamma = 4'});
+
+disp(Summary_table_T);
+
+writetable(Summary_table_T, 'Summary_table_T.csv', 'WriteRowNames', true);

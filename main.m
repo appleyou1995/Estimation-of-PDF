@@ -75,11 +75,10 @@ Target_TTM = Data(1, Index_TTM);
 
 % Bid >= 0.375
 Index = Data(:, Index_OP_Bid) >= 0.375;
-Data2 = Data(Index, :);
+Data = Data(Index, :);
 
 clear Index
 
-%% 
 
 % Out-of-the-Money (OTM) and Around At-the-Money (ATM) Options
 Index = (Data(:, Index_CPFlag) == 1) & ...
@@ -166,13 +165,32 @@ Smooth_OP = blsprice(S0, Smooth_K, RF, TTM, Smooth_IV, DY);
 % clear S0 DY
 
 
+%% Define Color (Metropolis Theme)
+
+mLightBrown      = '#f0f0f0';
+mDarkBrown       = '#333333';
+mDarkBrownAccent = '#666666';
+mDarkRed         = '#b22222';
+mLightBlue       = '#3279a8';
+mLightBlueAccent = '#3299cc';
+mLightGreen      = '#66cc99';
+mLightGreenAccent= '#99cc66';
+mDarkGreen       = '#4b8b3b';
+mOrange          = '#f39c12';
+mRed             = '#e74c3c';
+mDarkBlue        = '#2c3e50';
+mBackground      = '#FAFAFA';
+
+
 %% Plot Figure: Smoothed Implied Volatility (Fourth Order Spline Approximation)
 
-figure
+ImpliedVolatilities = figure;
+
+set(gcf, 'Color', mBackground);
 
 plot(Smooth_K, Smooth_IV, ...
      'LineWidth', 2, ...
-     'Color', 'r');   
+     'Color', mOrange);   
 hold on
 
 plot(Data(:, Index_K), Data(:, Index_IV), ...
@@ -180,19 +198,29 @@ plot(Data(:, Index_K), Data(:, Index_IV), ...
      'LineWidth', 2, ...
      'Marker', 'o', ...     
      'MarkerSize', 6, ...
-     'Color', 'b'); 
+     'Color', mDarkBlue); 
 grid on
 
-h1 = title(['Implied Volatilities with Interpolation and Smoothing (Date = ' datestr(datenum(num2str(Target_Date), 'yyyymmdd'), 'mmm dd, yyyy') ', Time to Maturity = ' num2str(Target_TTM) ' Days)']);
+h1 = title(['Implied Volatilities with Interpolation and Smoothing']);
 h2 = legend(['4th Degree Spline Interpolation (Without Knot)'], 'Raw Option Data');
 h3 = xlabel('Strike Price');
 h4 = ylabel('Implied Volatility');
 
 set([h1 h2 h3 h4], ...
-    'FontSize', 14, ...
-    'FontWeight', 'bold', ...
-    'LineWidth', 2)
+    'FontName', 'Fira Sans', ...
+    'FontSize', 10, ...
+    'LineWidth', 1)
+
+% Customize axes
+ax = gca;
+set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+
+set(gcf,'InvertHardcopy','off')
 clear h1 h2 h3 h4
+
+% Save the figure
+saveas(ImpliedVolatilities, 'ImpliedVolatilities.png');                    % Save as PNG image
+saveas(ImpliedVolatilities, 'ImpliedVolatilities.fig');                    % Save as MATLAB figure file
 
 
 %% Risk-Neutral Density and Distribution (Empirical)
@@ -223,27 +251,40 @@ Smooth_OP = Smooth_OP(2:(end - 1));
 
 %% Plot Figure: CDF
 
-figure
+Q_measure_CDF = figure;
+
+set(gcf, 'Color', mBackground);
 
 plot(Smooth_K, Smooth_EMP_CDF, ...
      'LineWidth', 2, ...
-     'Color', 'r');  
+     'Color', mDarkRed);  
 hold on
 
-set(gca,'XTick', min(Smooth_AllK):10:max(Smooth_AllK));
+set(gca,'XTick', min(Smooth_AllK):20:max(Smooth_AllK));
 xlim([540 690]);
+xtickformat('%.0f');
 grid on
 
-h1 = title(['CDF (Date = ' datestr(datenum(num2str(Target_Date), 'yyyymmdd'), 'mmm dd, yyyy') ', Time to Maturity = ' num2str(Target_TTM) ' Days)']);
+h1 = title(['Empirical Cumulative Distribution Function']);
 h2 = legend('Empirical CDF', 'Location', 'northwest');
 h3 = xlabel('Level of S&P 500 Index');
 h4 = ylabel('Cummulated Density');
 
 set([h1 h2 h3 h4], ...
-    'FontSize', 14, ...
-    'FontWeight', 'bold', ...
+    'FontSize', 10, ...
     'LineWidth', 2)
+
+% Customize axes
+ax = gca;
+set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+
+set(gcf,'InvertHardcopy','off')
+
 clear h1 h2 h3 h4
+
+% Save the figure
+saveas(Q_measure_CDF, 'Q_measure_CDF.png');
+saveas(Q_measure_CDF, 'Q_measure_CDF.fig');
 
 
 %% Risk-Neutral Density (Right-Tail Connection)
@@ -435,7 +476,7 @@ figure
 % Risk-Neutral Density (Empirical)
 plot(Smooth_K, Smooth_EMP_PDF, ...
      'LineWidth', 2, ...
-     'Color', 'r');     
+     'Color', mDarkRed);     
 hold on
  
 % Generalized Extreme Value Function (GEV, Right Tail)
@@ -443,7 +484,7 @@ try
     plot(Smooth_AllK, Smooth_GEV_R_PDF, ...
          'LineWidth', 2, ...
          'LineStyle', '--', ...
-         'Color', 'b');    
+         'Color', mLightBlue);    
     hold on
 catch
 end  
@@ -453,7 +494,7 @@ try
     plot(Smooth_AllK, Smooth_GEV_L_PDF, ...
          'LineWidth', 2, ...
          'LineStyle', ':', ...
-         'Color', 'g');    
+         'Color', mDarkGreen);    
     hold on
 catch
 end
@@ -462,71 +503,79 @@ end
 plot(Smooth_K(Smooth_K==K_R0), Smooth_EMP_PDF(Smooth_K==K_R0), ...
      'LineWidth', 2, ...
      'Marker', 'o', ...
-     'Color', 'r');    
+     'Color', mOrange);    
 text(Smooth_K(Smooth_K==K_R0), Smooth_EMP_PDF(Smooth_K==K_R0), ...
-     [num2str(100 * roundn(BP_R0, - 4)) '% \rightarrow  '], ...
-     'HorizontalAlignment', 'right', ...
+     ['  \leftarrow ' num2str(100 * roundn(BP_R0, - 4)) '%'], ...
+     'HorizontalAlignment', 'left', ...
      'VerticalAlignment', 'baseline', ...
-     'FontSize', 14, ...
-     'FontWeight', 'bold', ...
+     'FontSize', 11, ...
+     'FontName', 'Fira Sans Medium', ...
      'LineWidth', 2, ...
-     'Color', 'r');        
+     'Color', mOrange);        
 hold on
 
 plot(Smooth_K(Smooth_K==K_R1), Smooth_EMP_PDF(Smooth_K==K_R1), ...
      'LineWidth', 2, ...
      'Marker', 'o', ...
-     'Color', 'r');    
+     'Color', mOrange);    
 text(Smooth_K(Smooth_K==K_R1), Smooth_EMP_PDF(Smooth_K==K_R1), ...
-     [num2str(100 * roundn(BP_R1, - 4)) '% \rightarrow  '], ...
-     'HorizontalAlignment', 'right', ...
+     ['  \leftarrow ' num2str(100 * roundn(BP_R1, - 4)) '%'], ...
+     'HorizontalAlignment', 'left', ...
      'VerticalAlignment', 'baseline', ...
-     'FontSize', 14, ...
-     'FontWeight', 'bold', ...
+     'FontSize', 11, ...
+     'FontName', 'Fira Sans Medium', ...
      'LineWidth', 2, ...
-     'Color', 'r');       
+     'Color', mOrange);       
 hold on
 
 plot(Smooth_K(Smooth_K==K_L0), Smooth_EMP_PDF(Smooth_K==K_L0), ...
      'LineWidth', 2, ...
      'Marker', 'o', ...
-     'Color', 'r');    
+     'Color', mOrange);    
 text(Smooth_K(Smooth_K==K_L0), Smooth_EMP_PDF(Smooth_K==K_L0), ...
      [num2str(100 * roundn(BP_L0, - 4)) '% \rightarrow  '], ...
      'HorizontalAlignment', 'right', ...
      'VerticalAlignment', 'baseline', ...
-     'FontSize', 14, ...
-     'FontWeight', 'bold', ...
+     'FontSize', 11, ...
+     'FontName', 'Fira Sans Medium', ...
      'LineWidth', 2, ...
-     'Color', 'r');     
+     'Color', mOrange);     
 hold on
 
 plot(Smooth_K(Smooth_K==K_L1), Smooth_EMP_PDF(Smooth_K==K_L1), ...
      'LineWidth', 2, ...
      'Marker', 'o', ...
-     'Color', 'r');  
+     'Color', mOrange);  
 text(Smooth_K(Smooth_K==K_L1), Smooth_EMP_PDF(Smooth_K==K_L1), ...
      [num2str(100 * roundn(BP_L1, - 4)) '% \rightarrow  '], ...
      'HorizontalAlignment', 'right', ...
      'VerticalAlignment', 'baseline', ...
-     'FontSize', 14, ...
-     'FontWeight', 'bold', ...
+     'FontSize', 11, ...
+     'FontName', 'Fira Sans Medium', ...
      'LineWidth', 2, ...
-     'Color', 'r');   
+     'Color', mOrange);   
 
-set(gca,'XTick', min(Smooth_AllK):50:max(Smooth_AllK));
+set(gca,'XTick', min(Smooth_AllK):100:max(Smooth_AllK));
 xlim([min(Smooth_AllK) max(Smooth_AllK)]);
+xtickformat('%.0f');
 grid on
 
-h1 = title(['Risk-Neutral Density and Fitted GEV Tail Functions (Date = ' datestr(datenum(num2str(Target_Date), 'yyyymmdd'), 'mmm dd, yyyy') ', Time to Maturity = ' num2str(Target_TTM) ' Days)']);
+h1 = title(['Risk-Neutral Density and Fitted GEV Tail Functions']);
 h2 = legend('Empirical RND', 'Right Tail GEV Function', 'Left Tail GEV Function', 'Connection Points');
 h3 = xlabel('Level of S&P 500 Index');
 h4 = ylabel('Density');
 
 set([h1 h2 h3 h4], ...
-    'FontSize', 14, ...
-    'FontWeight', 'bold', ...
-    'LineWidth', 2)
+    'FontName', 'Fira Sans', ...
+    'FontSize', 10, ...
+    'LineWidth', 1)
+
+% Customize axes
+ax = gca;
+set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+
+set(gcf,'InvertHardcopy','off')
+
 clear h1 h2 h3 h4
 
 
@@ -555,43 +604,59 @@ end
 
 %% Plot Figure: Risk-Neutral Density (Partial Density)
 
-figure
+Q_measure_PDF_Partial = figure;
+
+set(gcf, 'Color', mBackground);
 
 plot(Smooth_AllK(Index_EMP), Smooth_RND(Index_EMP), ...
      'LineWidth', 2, ...
-     'Color', 'r');     
+     'Color', mDarkRed);     
 hold on
 
-set(gca,'XTick', min(Smooth_AllK):10:max(Smooth_AllK));
-xlim([550 700]);
+set(gca,'XTick', min(Smooth_AllK):20:max(Smooth_AllK));
+xlim([560 690]);
+xtickformat('%.0f');
 grid on
 
-h1 = title(['Partial Estimated Risk-Neutral Density Function (Date = ' datestr(datenum(num2str(Target_Date), 'yyyymmdd'), 'mmm dd, yyyy') ', Time to Maturity = ' num2str(Target_TTM) ' Days)']);
-h2 = legend('Empirical RND');
+h1 = title(['Partial Estimated Risk-Neutral Density Function']);
+h2 = legend('Empirical RND', 'Location', 'northwest');
 h3 = xlabel('Level of S&P 500 Index');
-h4 = ylabel('Density');
+h4 = ylabel('Probability Density');
 
 set([h1 h2 h3 h4], ...
-    'FontSize', 14, ...
-    'FontWeight', 'bold', ...
+    'FontName', 'Fira Sans', ...
+    'FontSize', 10, ...
     'LineWidth', 2)
+
+% Customize axes
+ax = gca;
+set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+
+set(gcf,'InvertHardcopy','off')
+
 clear h1 h2 h3 h4
+
+% Save the figure
+saveas(Q_measure_PDF_Partial, 'Q_measure_PDF_Partial.png');
+saveas(Q_measure_PDF_Partial, 'Q_measure_PDF_Partial.fig'); 
 
 
 %% Plot Figure: Risk-Neutral Density (Full Density)
 
-figure
+Q_measure_PDF_Full = figure;
+
+set(gcf, 'Color', mBackground);
 
 plot(Smooth_AllK(Index_EMP), Smooth_RND(Index_EMP), ...
      'LineWidth', 2, ...
-     'Color', 'r');     
+     'Color', mDarkRed);     
 hold on
 
 try
     plot(Smooth_AllK(Index_GEV_R), Smooth_RND(Index_GEV_R), ...
          'LineWidth', 2, ...
          'LineStyle', '--', ...
-         'Color', 'b');     
+         'Color', mLightBlue);     
     hold on
 catch
 end
@@ -600,45 +665,180 @@ try
     plot(Smooth_AllK(Index_GEV_L), Smooth_RND(Index_GEV_L), ...
          'LineWidth', 2, ...
          'LineStyle', ':', ...
-         'Color', 'g');     
+         'Color', mDarkGreen);     
 catch
 end
 
 set(gca,'XTick', min(Smooth_AllK):100:max(Smooth_AllK));
 xlim([min(Smooth_AllK) max(Smooth_AllK)]);
+xtickformat('%.0f');
 grid on
 
-h1 = title(['Full Estimated Risk-Neutral Density Function (Date = ' datestr(datenum(num2str(Target_Date), 'yyyymmdd'), 'mmm dd, yyyy') ', Time to Maturity = ' num2str(Target_TTM) ' Days)']);
+h1 = title('Full Estimated Risk-Neutral Density Function');
 h2 = legend('Empirical RND', 'Right GEV Tail', 'Left GEV Tail');
 h3 = xlabel('Level of S&P 500 Index');
-h4 = ylabel('Density');
+h4 = ylabel('Probability Density');
 
 set([h1 h2 h3 h4], ...
-    'FontSize', 14, ...
-    'FontWeight', 'bold', ...
+    'FontName', 'Fira Sans', ...
+    'FontSize', 10, ...
     'LineWidth', 2)
+
+% Customize axes
+ax = gca;
+set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+
+set(gcf,'InvertHardcopy','off')
+
 clear h1 h2 h3 h4
 
-
-%% Setting Numerator with Different Gamma
-
-gamma_1 = Smooth_AllK .^ 1 .* Smooth_RND;
-gamma_2 = Smooth_AllK .^ 2 .* Smooth_RND;
-gamma_3 = Smooth_AllK .^ 3 .* Smooth_RND;
-gamma_4 = Smooth_AllK .^ 4 .* Smooth_RND;
+% Save the figure
+saveas(Q_measure_PDF_Full, 'Q_measure_PDF_Full.png');
+saveas(Q_measure_PDF_Full, 'Q_measure_PDF_Full.fig');
 
 
-%% Real-World Densities
+%% [CARA] Constant Absolute Risk Aversion Utility Function
 
-P_Density_gamma_1 = gamma_1 ./ trapz(Smooth_AllK, gamma_1);
-P_Density_gamma_2 = gamma_2 ./ trapz(Smooth_AllK, gamma_2);
-P_Density_gamma_3 = gamma_3 ./ trapz(Smooth_AllK, gamma_3);
-P_Density_gamma_4 = gamma_4 ./ trapz(Smooth_AllK, gamma_4);
+alpha_1 = 0.01;
+alpha_2 = 0.02;
+alpha_3 = 0.03;
+alpha_4 = 0.04;
+
+% [Negative Exponential Utility] Setting Numerator with Different Alpha
+
+utility_alpha_1 = (1 / alpha_1) .* exp(alpha_1 .* Smooth_AllK) .* Smooth_RND;
+utility_alpha_2 = (1 / alpha_2) .* exp(alpha_2 .* Smooth_AllK) .* Smooth_RND;
+utility_alpha_3 = (1 / alpha_3) .* exp(alpha_3 .* Smooth_AllK) .* Smooth_RND;
+utility_alpha_4 = (1 / alpha_4) .* exp(alpha_4 .* Smooth_AllK) .* Smooth_RND;
+
+% [Negative Exponential Utility] Real-World Densities
+P_Density_alpha_1 = utility_alpha_1 ./ trapz(Smooth_AllK, utility_alpha_1);
+P_Density_alpha_2 = utility_alpha_2 ./ trapz(Smooth_AllK, utility_alpha_2);
+P_Density_alpha_3 = utility_alpha_3 ./ trapz(Smooth_AllK, utility_alpha_3);
+P_Density_alpha_4 = utility_alpha_4 ./ trapz(Smooth_AllK, utility_alpha_4);
 
 
-%% Plot Figure: Physical Density (Full Density)
+%% [CARA] Plot Figure: Physical Density (Full Density)
 
-figure;
+P_measure_PDF_CARA_Full = figure;
+
+set(gcf, 'Color', mBackground);
+
+plot(Smooth_AllK, P_Density_alpha_1, '-', 'LineWidth', 2);
+hold on;
+plot(Smooth_AllK, P_Density_alpha_2, '-', 'LineWidth', 2);
+plot(Smooth_AllK, P_Density_alpha_3, '-', 'LineWidth', 2);
+plot(Smooth_AllK, P_Density_alpha_4, '-', 'LineWidth', 2);
+hold off;
+
+set(gca,'XTick', min(Smooth_AllK):100:max(Smooth_AllK));
+set(gca,'YTick', 0:0.002:0.02);
+xlim([min(Smooth_AllK) max(Smooth_AllK)]);
+xtickformat('%.0f');
+grid on
+
+legendText1 = sprintf('alpha=%.2f', alpha_1);
+legendText2 = sprintf('alpha=%.2f', alpha_2);
+legendText3 = sprintf('alpha=%.2f', alpha_3);
+legendText4 = sprintf('alpha=%.2f', alpha_4);
+
+h1 = title('Full Physical Density Function (Negative Exponential Utility)');
+h2 = legend(legendText1, legendText2, legendText3, legendText4);
+h3 = xlabel('Level of S&P 500 Index');
+h4 = ylabel('Probability Density');
+
+set([h1 h2 h3 h4], ...
+    'FontName', 'Fira Sans', ...
+    'FontSize', 10, ...
+    'LineWidth', 2)
+
+% Customize axes
+ax = gca;
+set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+
+set(gcf,'InvertHardcopy','off')
+
+clear h1 h2 h3 h4 legendText1 legendText2 legendText3 legendText4
+
+% Save the figure
+saveas(P_measure_PDF_CARA_Full, 'P_measure_PDF_CARA_Full.png');
+saveas(P_measure_PDF_CARA_Full, 'P_measure_PDF_CARA_Full.fig');
+
+
+%% [CARA] Plot Figure: Physical Density (Partial Density)
+
+P_measure_PDF_CARA_Partial = figure;
+
+set(gcf, 'Color', mBackground);
+
+plot(Smooth_AllK, P_Density_alpha_1, '-', 'LineWidth', 2);
+hold on;
+plot(Smooth_AllK, P_Density_alpha_2, '-', 'LineWidth', 2);
+plot(Smooth_AllK, P_Density_alpha_3, '-', 'LineWidth', 2);
+plot(Smooth_AllK, P_Density_alpha_4, '-', 'LineWidth', 2);
+hold off;
+
+set(gca,'XTick', min(Smooth_AllK):40:max(Smooth_AllK));
+set(gca,'YTick', 0:0.002:0.02);
+xlim([600, 740]);
+ylim([0.01, 0.02]);
+xtickformat('%.0f');
+grid on
+
+legendText1 = sprintf('alpha=%.2f', alpha_1);
+legendText2 = sprintf('alpha=%.2f', alpha_2);
+legendText3 = sprintf('alpha=%.2f', alpha_3);
+legendText4 = sprintf('alpha=%.2f', alpha_4);
+
+h1 = title('Partial Physical Density Function (Negative Exponential Utility)');
+h2 = legend(legendText1, legendText2, legendText3, legendText4);
+h3 = xlabel('Level of S&P 500 Index');
+h4 = ylabel('Probability Density');
+
+set([h1 h2 h3 h4], ...
+    'FontName', 'Fira Sans', ...
+    'FontSize', 10, ...
+    'LineWidth', 2)
+
+% Customize axes
+ax = gca;
+set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+
+set(gcf,'InvertHardcopy','off')
+
+clear h1 h2 h3 h4 legendText1 legendText2 legendText3 legendText4
+
+% Save the figure
+saveas(P_measure_PDF_CARA_Partial, 'P_measure_PDF_CARA_Partial.png');
+saveas(P_measure_PDF_CARA_Partial, 'P_measure_PDF_CARA_Partial.fig');
+
+
+%% [CRRA] Constant Relative Risk Aversion Utility Function
+
+gamma_1 = 1;
+gamma_2 = 2;
+gamma_3 = 3;
+gamma_4 = 4;
+
+% [Power Utility] Setting Numerator with Different Gamma
+utility_gamma_1 = Smooth_AllK .^ gamma_1 .* Smooth_RND;
+utility_gamma_2 = Smooth_AllK .^ gamma_2 .* Smooth_RND;
+utility_gamma_3 = Smooth_AllK .^ gamma_3 .* Smooth_RND;
+utility_gamma_4 = Smooth_AllK .^ gamma_4 .* Smooth_RND;
+
+% [Power Utility] Real-World Densities
+P_Density_gamma_1 = utility_gamma_1 ./ trapz(Smooth_AllK, utility_gamma_1);
+P_Density_gamma_2 = utility_gamma_2 ./ trapz(Smooth_AllK, utility_gamma_2);
+P_Density_gamma_3 = utility_gamma_3 ./ trapz(Smooth_AllK, utility_gamma_3);
+P_Density_gamma_4 = utility_gamma_4 ./ trapz(Smooth_AllK, utility_gamma_4);
+
+
+%% [CRRA] Plot Figure: Physical Density (Full Density)
+
+P_measure_PDF_CRRA_Full = figure;
+
+set(gcf, 'Color', mBackground);
+
 plot(Smooth_AllK, P_Density_gamma_1, '-', 'LineWidth', 2);
 hold on;
 plot(Smooth_AllK, P_Density_gamma_2, '-', 'LineWidth', 2);
@@ -647,19 +847,85 @@ plot(Smooth_AllK, P_Density_gamma_4, '-', 'LineWidth', 2);
 hold off;
 
 set(gca,'XTick', min(Smooth_AllK):100:max(Smooth_AllK));
+set(gca,'YTick', 0:0.002:0.02);
 xlim([min(Smooth_AllK) max(Smooth_AllK)]);
+xtickformat('%.0f');
 grid on
 
-h1 = title(['Full Physical Density Function (Date = ' datestr(datenum(num2str(Target_Date), 'yyyymmdd'), 'mmm dd, yyyy') ', Time to Maturity = ' num2str(Target_TTM) ' Days)']);
-h2 = legend('gamma=1', 'gamma=2', 'gamma=3', 'gamma=4');
+legendText1 = sprintf('gamma=%.0f', gamma_1);
+legendText2 = sprintf('gamma=%.0f', gamma_2);
+legendText3 = sprintf('gamma=%.0f', gamma_3);
+legendText4 = sprintf('gamma=%.0f', gamma_4);
+
+h1 = title('Full Physical Density Function (Power Utility)');
+h2 = legend(legendText1, legendText2, legendText3, legendText4);
 h3 = xlabel('Level of S&P 500 Index');
-h4 = ylabel('Density');
+h4 = ylabel('Probability Density');
 
 set([h1 h2 h3 h4], ...
-    'FontSize', 14, ...
-    'FontWeight', 'bold', ...
+    'FontName', 'Fira Sans', ...
+    'FontSize', 10, ...
     'LineWidth', 2)
-clear h1 h2 h3 h4
+
+% Customize axes
+ax = gca;
+set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+
+set(gcf,'InvertHardcopy','off')
+
+clear h1 h2 h3 h4 legendText1 legendText2 legendText3 legendText4
+
+% Save the figure
+saveas(P_measure_PDF_CRRA_Full, 'P_measure_PDF_CRRA_Full.png');
+saveas(P_measure_PDF_CRRA_Full, 'P_measure_PDF_CRRA_Full.fig');
+
+
+%% [CRRA] Plot Figure: Physical Density (Partial Density)
+
+P_measure_PDF_CRRA_Partial = figure;
+
+set(gcf, 'Color', mBackground);
+
+plot(Smooth_AllK, P_Density_gamma_1, '-', 'LineWidth', 2);
+hold on;
+plot(Smooth_AllK, P_Density_gamma_2, '-', 'LineWidth', 2);
+plot(Smooth_AllK, P_Density_gamma_3, '-', 'LineWidth', 2);
+plot(Smooth_AllK, P_Density_gamma_4, '-', 'LineWidth', 2);
+hold off;
+
+set(gca,'XTick', min(Smooth_AllK):10:max(Smooth_AllK));
+set(gca,'YTick', 0:0.001:0.02);
+xlim([600, 700]);
+ylim([0.014, 0.017]);
+xtickformat('%.0f');
+grid on
+
+legendText1 = sprintf('gamma=%.0f', gamma_1);
+legendText2 = sprintf('gamma=%.0f', gamma_2);
+legendText3 = sprintf('gamma=%.0f', gamma_3);
+legendText4 = sprintf('gamma=%.0f', gamma_4);
+
+h1 = title('Partial Physical Density Function (Power Utility)');
+h2 = legend(legendText1, legendText2, legendText3, legendText4);
+h3 = xlabel('Level of S&P 500 Index');
+h4 = ylabel('Probability Density');
+
+set([h1 h2 h3 h4], ...
+    'FontName', 'Fira Sans', ...
+    'FontSize', 10, ...
+    'LineWidth', 2)
+
+% Customize axes
+ax = gca;
+set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+
+set(gcf,'InvertHardcopy','off')
+
+clear h1 h2 h3 h4 legendText1 legendText2 legendText3 legendText4
+
+% Save the figure
+saveas(P_measure_PDF_CRRA_Partial, 'P_measure_PDF_CRRA_Partial.png');
+saveas(P_measure_PDF_CRRA_Partial, 'P_measure_PDF_CRRA_Partial.fig');
 
 
 %% Calculate Statistical Moments of Return
@@ -667,6 +933,10 @@ clear h1 h2 h3 h4
 S_t = Data(1, Index_S);
 S_T = Smooth_AllK;
 R_T = S_T / S_t;
+
+RND_mean = trapz(Smooth_AllK, R_T .* Smooth_RND);
+RND_square_mean = trapz(Smooth_AllK, R_T .^ 2 .* Smooth_RND);
+RND_variance = RND_square_mean - RND_mean ^ 2;
 
 gamma_1_mean = trapz(Smooth_AllK, R_T .* P_Density_gamma_1);
 gamma_1_square_mean = trapz(Smooth_AllK, R_T .^ 2 .* P_Density_gamma_1);

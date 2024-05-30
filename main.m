@@ -201,10 +201,15 @@ plot(Data(:, Index_K), Data(:, Index_IV), ...
      'Color', mDarkBlue); 
 grid on
 
-h1 = title(['Implied Volatilities with Interpolation and Smoothing']);
-h2 = legend(['4th Degree Spline Interpolation (Without Knot)'], 'Raw Option Data');
+h1 = title('Implied Volatilities with Interpolation and Smoothing');
+h2 = legend('4th Degree Spline Interpolation (Without Knot)', 'Raw Option Data');
 h3 = xlabel('Strike Price');
 h4 = ylabel('Implied Volatility');
+
+% Adjust the title position
+titlePosition = get(h1, 'Position');
+titlePosition(2) = titlePosition(2) + 0.005; % Adjust this value as needed
+set(h1, 'Position', titlePosition);
 
 set([h1 h2 h3 h4], ...
     'FontName', 'Fira Sans', ...
@@ -213,7 +218,7 @@ set([h1 h2 h3 h4], ...
 
 % Customize axes
 ax = gca;
-set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
 
 set(gcf,'InvertHardcopy','off')
 clear h1 h2 h3 h4
@@ -265,18 +270,24 @@ xlim([540 690]);
 xtickformat('%.0f');
 grid on
 
-h1 = title(['Empirical Cumulative Distribution Function']);
+h1 = title('Empirical Cumulative Distribution Function');
 h2 = legend('Empirical CDF', 'Location', 'northwest');
 h3 = xlabel('Level of S&P 500 Index');
 h4 = ylabel('Cummulated Density');
 
+% Adjust the title position
+titlePosition = get(h1, 'Position');
+titlePosition(2) = titlePosition(2) + 0.015; % Adjust this value as needed
+set(h1, 'Position', titlePosition);
+
 set([h1 h2 h3 h4], ...
+    'FontName', 'Fira Sans', ...
     'FontSize', 10, ...
     'LineWidth', 2)
 
 % Customize axes
 ax = gca;
-set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
 
 set(gcf,'InvertHardcopy','off')
 
@@ -618,10 +629,15 @@ xlim([560 690]);
 xtickformat('%.0f');
 grid on
 
-h1 = title(['Partial Estimated Risk-Neutral Density Function']);
+h1 = title('Partial Estimated Risk-Neutral Density Function');
 h2 = legend('Empirical RND', 'Location', 'northwest');
 h3 = xlabel('Level of S&P 500 Index');
 h4 = ylabel('Probability Density');
+
+% Adjust the title position
+titlePosition = get(h1, 'Position');
+titlePosition(2) = titlePosition(2) + 0.0005; % Adjust this value as needed
+set(h1, 'Position', titlePosition);
 
 set([h1 h2 h3 h4], ...
     'FontName', 'Fira Sans', ...
@@ -630,7 +646,7 @@ set([h1 h2 h3 h4], ...
 
 % Customize axes
 ax = gca;
-set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
 
 set(gcf,'InvertHardcopy','off')
 
@@ -679,6 +695,11 @@ h2 = legend('Empirical RND', 'Right GEV Tail', 'Left GEV Tail');
 h3 = xlabel('Level of S&P 500 Index');
 h4 = ylabel('Probability Density');
 
+% Adjust the title position
+titlePosition = get(h1, 'Position');
+titlePosition(2) = titlePosition(2) + 0.0005; % Adjust this value as needed
+set(h1, 'Position', titlePosition);
+
 set([h1 h2 h3 h4], ...
     'FontName', 'Fira Sans', ...
     'FontSize', 10, ...
@@ -686,7 +707,7 @@ set([h1 h2 h3 h4], ...
 
 % Customize axes
 ax = gca;
-set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
 
 set(gcf,'InvertHardcopy','off')
 
@@ -747,6 +768,11 @@ h2 = legend(legendText1, legendText2, legendText3, legendText4);
 h3 = xlabel('Level of S&P 500 Index');
 h4 = ylabel('Probability Density');
 
+% Adjust the title position
+titlePosition = get(h1, 'Position');
+titlePosition(2) = titlePosition(2) + 0.0005; % Adjust this value as needed
+set(h1, 'Position', titlePosition);
+
 set([h1 h2 h3 h4], ...
     'FontName', 'Fira Sans', ...
     'FontSize', 10, ...
@@ -754,7 +780,7 @@ set([h1 h2 h3 h4], ...
 
 % Customize axes
 ax = gca;
-set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
 
 set(gcf,'InvertHardcopy','off')
 
@@ -795,6 +821,11 @@ h2 = legend(legendText1, legendText2, legendText3, legendText4);
 h3 = xlabel('Level of S&P 500 Index');
 h4 = ylabel('Probability Density');
 
+% Adjust the title position
+titlePosition = get(h1, 'Position');
+titlePosition(2) = titlePosition(2) + 0.0002; % Adjust this value as needed
+set(h1, 'Position', titlePosition);
+
 set([h1 h2 h3 h4], ...
     'FontName', 'Fira Sans', ...
     'FontSize', 10, ...
@@ -802,7 +833,7 @@ set([h1 h2 h3 h4], ...
 
 % Customize axes
 ax = gca;
-set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
 
 set(gcf,'InvertHardcopy','off')
 
@@ -811,6 +842,74 @@ clear h1 h2 h3 h4 legendText1 legendText2 legendText3 legendText4
 % Save the figure
 saveas(P_measure_PDF_CARA_Partial, 'P_measure_PDF_CARA_Partial.png');
 saveas(P_measure_PDF_CARA_Partial, 'P_measure_PDF_CARA_Partial.fig');
+
+
+%% [CARA] Plot Figure: Physical Density (Zoom-in Density)
+
+P_measure_PDF_CARA_Zoom = figure;
+
+set(gcf, 'Color', mBackground);
+
+plot(Smooth_AllK, P_Density_alpha_1, '-', 'LineWidth', 2, 'Color', mDarkGreen);
+hold on;
+plot(Smooth_AllK, P_Density_alpha_2, '-', 'LineWidth', 2, 'Color', mOrange);
+plot(Smooth_AllK, P_Density_alpha_3, '-', 'LineWidth', 2, 'Color', mLightBlue);
+plot(Smooth_AllK, P_Density_alpha_4, '-', 'LineWidth', 2, 'Color', mDarkRed);
+hold off;
+
+set(gca,'XTick', min(Smooth_AllK):100:max(Smooth_AllK));
+set(gca,'YTick', 0:0.002:0.02);
+xlim([min(Smooth_AllK) max(Smooth_AllK)]);
+xtickformat('%.0f');
+grid on
+
+legendText1 = sprintf('alpha=%.2f', alpha_1);
+legendText2 = sprintf('alpha=%.2f', alpha_2);
+legendText3 = sprintf('alpha=%.2f', alpha_3);
+legendText4 = sprintf('alpha=%.2f', alpha_4);
+
+h1 = title('Full Physical Density Function (Negative Exponential Utility)');
+h2 = legend(legendText1, legendText2, legendText3, legendText4);
+h3 = xlabel('Level of S&P 500 Index');
+h4 = ylabel('Probability Density');
+
+% Adjust the title position
+titlePosition = get(h1, 'Position');
+titlePosition(2) = titlePosition(2) + 0.0005; % Adjust this value as needed
+set(h1, 'Position', titlePosition);
+
+set([h1 h2 h3 h4], ...
+    'FontName', 'Fira Sans', ...
+    'FontSize', 10, ...
+    'LineWidth', 2)
+
+% Customize axes
+ax = gca;
+set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
+
+% Add inset axes for zoomed-in plot
+inset_axes = axes('Position',[0.55 0.3 0.3 0.35]); % Adjust position and size as needed
+box on % Add a box around the inset plot
+plot(Smooth_AllK, P_Density_alpha_1, '-', 'LineWidth', 2, 'Color', mDarkGreen);
+hold on;
+plot(Smooth_AllK, P_Density_alpha_2, '-', 'LineWidth', 2, 'Color', mOrange);
+plot(Smooth_AllK, P_Density_alpha_3, '-', 'LineWidth', 2, 'Color', mLightBlue);
+plot(Smooth_AllK, P_Density_alpha_4, '-', 'LineWidth', 2, 'Color', mDarkRed);
+hold off;
+set(gca, 'XTick', 620:20:700, 'YTick', 0.01:0.002:0.02);
+xlim([620, 700]);
+ylim([0.01, 0.02]);
+grid on
+
+set(inset_axes, 'FontName', 'Fira Sans Light', 'FontSize', 8); % Customize inset axes
+
+set(gcf,'InvertHardcopy','off')
+
+clear h1 h2 h3 h4 legendText1 legendText2 legendText3 legendText4
+
+% Save the figure
+saveas(P_measure_PDF_CARA_Zoom, 'P_measure_PDF_CARA_Zoom.png');
+saveas(P_measure_PDF_CARA_Zoom, 'P_measure_PDF_CARA_Zoom.fig');
 
 
 %% [CRRA] Constant Relative Risk Aversion Utility Function
@@ -862,6 +961,11 @@ h2 = legend(legendText1, legendText2, legendText3, legendText4);
 h3 = xlabel('Level of S&P 500 Index');
 h4 = ylabel('Probability Density');
 
+% Adjust the title position
+titlePosition = get(h1, 'Position');
+titlePosition(2) = titlePosition(2) + 0.0005; % Adjust this value as needed
+set(h1, 'Position', titlePosition);
+
 set([h1 h2 h3 h4], ...
     'FontName', 'Fira Sans', ...
     'FontSize', 10, ...
@@ -869,7 +973,7 @@ set([h1 h2 h3 h4], ...
 
 % Customize axes
 ax = gca;
-set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
 
 set(gcf,'InvertHardcopy','off')
 
@@ -910,6 +1014,11 @@ h2 = legend(legendText1, legendText2, legendText3, legendText4);
 h3 = xlabel('Level of S&P 500 Index');
 h4 = ylabel('Probability Density');
 
+% Adjust the title position
+titlePosition = get(h1, 'Position');
+titlePosition(2) = titlePosition(2) + 0.0001; % Adjust this value as needed
+set(h1, 'Position', titlePosition);
+
 set([h1 h2 h3 h4], ...
     'FontName', 'Fira Sans', ...
     'FontSize', 10, ...
@@ -917,7 +1026,7 @@ set([h1 h2 h3 h4], ...
 
 % Customize axes
 ax = gca;
-set(ax, 'FontName', 'Fira Sans', 'FontSize', 12);
+set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
 
 set(gcf,'InvertHardcopy','off')
 
@@ -926,6 +1035,74 @@ clear h1 h2 h3 h4 legendText1 legendText2 legendText3 legendText4
 % Save the figure
 saveas(P_measure_PDF_CRRA_Partial, 'P_measure_PDF_CRRA_Partial.png');
 saveas(P_measure_PDF_CRRA_Partial, 'P_measure_PDF_CRRA_Partial.fig');
+
+
+%% [CRRA] Plot Figure: Physical Density (Zoom-in Density)
+
+P_measure_PDF_CRRA_Zoom = figure;
+
+set(gcf, 'Color', mBackground);
+
+plot(Smooth_AllK, P_Density_gamma_1, '-', 'LineWidth', 2, 'Color', mDarkGreen);
+hold on;
+plot(Smooth_AllK, P_Density_gamma_2, '-', 'LineWidth', 2, 'Color', mOrange);
+plot(Smooth_AllK, P_Density_gamma_3, '-', 'LineWidth', 2, 'Color', mLightBlue);
+plot(Smooth_AllK, P_Density_gamma_4, '-', 'LineWidth', 2, 'Color', mDarkRed);
+hold off;
+
+set(gca,'XTick', min(Smooth_AllK):100:max(Smooth_AllK));
+set(gca,'YTick', 0:0.002:0.02);
+xlim([min(Smooth_AllK) max(Smooth_AllK)]);
+xtickformat('%.0f');
+grid on
+
+legendText1 = sprintf('gamma=%.0f', gamma_1);
+legendText2 = sprintf('gamma=%.0f', gamma_2);
+legendText3 = sprintf('gamma=%.0f', gamma_3);
+legendText4 = sprintf('gamma=%.0f', gamma_4);
+
+h1 = title('Full Physical Density Function (Power Utility)');
+h2 = legend(legendText1, legendText2, legendText3, legendText4);
+h3 = xlabel('Level of S&P 500 Index');
+h4 = ylabel('Probability Density');
+
+% Adjust the title position
+titlePosition = get(h1, 'Position');
+titlePosition(2) = titlePosition(2) + 0.0005; % Adjust this value as needed
+set(h1, 'Position', titlePosition);
+
+set([h1 h2 h3 h4], ...
+    'FontName', 'Fira Sans', ...
+    'FontSize', 10, ...
+    'LineWidth', 2)
+
+% Customize axes
+ax = gca;
+set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
+
+% Add inset axes for zoomed-in plot
+inset_axes = axes('Position',[0.55 0.3 0.3 0.35]); % Adjust position and size as needed
+box on % Add a box around the inset plot
+plot(Smooth_AllK, P_Density_gamma_1, '-', 'LineWidth', 2, 'Color', mDarkGreen);
+hold on;
+plot(Smooth_AllK, P_Density_gamma_2, '-', 'LineWidth', 2, 'Color', mOrange);
+plot(Smooth_AllK, P_Density_gamma_3, '-', 'LineWidth', 2, 'Color', mLightBlue);
+plot(Smooth_AllK, P_Density_gamma_4, '-', 'LineWidth', 2, 'Color', mDarkRed);
+hold off;
+set(gca, 'XTick', 630:10:670, 'YTick', 0.014:0.001:0.017);
+xlim([630, 670]);
+ylim([0.014, 0.017]);
+grid on
+
+set(inset_axes, 'FontName', 'Fira Sans Light', 'FontSize', 8); % Customize inset axes
+
+set(gcf,'InvertHardcopy','off')
+
+clear h1 h2 h3 h4 legendText1 legendText2 legendText3 legendText4
+
+% Save the figure
+saveas(P_measure_PDF_CRRA_Zoom, 'P_measure_PDF_CRRA_Zoom.png');
+saveas(P_measure_PDF_CRRA_Zoom, 'P_measure_PDF_CRRA_Zoom.fig');
 
 
 %% Calculate Statistical Moments of Return

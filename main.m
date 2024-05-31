@@ -254,6 +254,50 @@ Smooth_IV = Smooth_IV(2:(end - 1));                                        % Upd
 Smooth_OP = Smooth_OP(2:(end - 1));
 
 
+%% Plot Figure: Risk-Neutral Density (Partial Density)
+
+Q_measure_PDF_Partial = figure;
+
+set(gcf, 'Color', mBackground);
+
+plot(Smooth_K, Smooth_EMP_PDF, ...
+     'LineWidth', 2, ...
+     'Color', mDarkRed);     
+hold on
+
+set(gca,'XTick', min(Smooth_AllK):20:max(Smooth_AllK));
+xlim([540 690]);
+xtickformat('%.0f');
+grid on
+
+h1 = title('Partial Estimated Risk-Neutral Density Function');
+h2 = legend('Empirical RND', 'Location', 'northwest');
+h3 = xlabel('Level of S&P 500 Index');
+h4 = ylabel('Probability Density');
+
+% Adjust the title position
+titlePosition = get(h1, 'Position');
+titlePosition(2) = titlePosition(2) + 0.0005; % Adjust this value as needed
+set(h1, 'Position', titlePosition);
+
+set([h1 h2 h3 h4], ...
+    'FontName', 'Fira Sans', ...
+    'FontSize', 10, ...
+    'LineWidth', 2)
+
+% Customize axes
+ax = gca;
+set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
+
+set(gcf,'InvertHardcopy','off')
+
+clear h1 h2 h3 h4
+
+% Save the figure
+saveas(Q_measure_PDF_Partial, 'Q_measure_PDF_Partial.png');
+saveas(Q_measure_PDF_Partial, 'Q_measure_PDF_Partial.fig'); 
+
+
 %% Plot Figure: CDF
 
 Q_measure_CDF = figure;
@@ -611,50 +655,6 @@ try
     Smooth_RND(Index_GEV_L) = Smooth_GEV_L_PDF(Index_GEV_L);
 catch
 end
-
-
-%% Plot Figure: Risk-Neutral Density (Partial Density)
-
-Q_measure_PDF_Partial = figure;
-
-set(gcf, 'Color', mBackground);
-
-plot(Smooth_AllK(Index_EMP), Smooth_RND(Index_EMP), ...
-     'LineWidth', 2, ...
-     'Color', mDarkRed);     
-hold on
-
-set(gca,'XTick', min(Smooth_AllK):20:max(Smooth_AllK));
-xlim([560 690]);
-xtickformat('%.0f');
-grid on
-
-h1 = title('Partial Estimated Risk-Neutral Density Function');
-h2 = legend('Empirical RND', 'Location', 'northwest');
-h3 = xlabel('Level of S&P 500 Index');
-h4 = ylabel('Probability Density');
-
-% Adjust the title position
-titlePosition = get(h1, 'Position');
-titlePosition(2) = titlePosition(2) + 0.0005; % Adjust this value as needed
-set(h1, 'Position', titlePosition);
-
-set([h1 h2 h3 h4], ...
-    'FontName', 'Fira Sans', ...
-    'FontSize', 10, ...
-    'LineWidth', 2)
-
-% Customize axes
-ax = gca;
-set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
-
-set(gcf,'InvertHardcopy','off')
-
-clear h1 h2 h3 h4
-
-% Save the figure
-saveas(Q_measure_PDF_Partial, 'Q_measure_PDF_Partial.png');
-saveas(Q_measure_PDF_Partial, 'Q_measure_PDF_Partial.fig'); 
 
 
 %% Plot Figure: Risk-Neutral Density (Full Density)

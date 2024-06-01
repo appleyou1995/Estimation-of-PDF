@@ -165,21 +165,15 @@ Smooth_OP = blsprice(S0, Smooth_K, RF, TTM, Smooth_IV, DY);
 % clear S0 DY
 
 
-%% Define Color (Metropolis Theme)
+%% Define Color (LaTeX Beamer Theme - Metropolis)
 
-mLightBrown      = '#f0f0f0';
-mDarkBrown       = '#333333';
-mDarkBrownAccent = '#666666';
-mDarkRed         = '#b22222';
-mLightBlue       = '#3279a8';
-mLightBlueAccent = '#3299cc';
-mLightGreen      = '#66cc99';
-mLightGreenAccent= '#99cc66';
-mDarkGreen       = '#4b8b3b';
-mOrange          = '#f39c12';
-mRed             = '#e74c3c';
-mDarkBlue        = '#2c3e50';
-mBackground      = '#FAFAFA';
+mRed        = '#e74c3c';
+mDarkRed    = '#b22222';
+mLightBlue  = '#3279a8';
+mDarkBlue   = '#2c3e50';
+mDarkGreen  = '#4b8b3b';
+mOrange     = '#f39c12';
+mBackground = '#FAFAFA';
 
 
 %% Plot Figure: Smoothed Implied Volatility (Fourth Order Spline Approximation)

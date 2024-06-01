@@ -5,16 +5,13 @@ import os
 import pandas as pd
 
 
-# %%  Connect to WRDS & Get the properties of database
+# %%  Connect to WRDS & Get the properties of database [ Option ]
 
 conn = wrds.Connection(wrds_username='irisyu')
 
 libraries          = conn.list_libraries()
 tables_option      = conn.list_tables(library='optionm_all')
 col_headers_option = conn.describe_table(library='optionm_all', table='opprcd2023')
-
-
-# %%  Setting query & Load data
 
 query_option = text("""
                     SELECT 
@@ -36,15 +33,45 @@ print(df_19960717_raw.head())
 conn.close()
 
 
-# %%  Get the properties of database
+# %%  Connect to WRDS & Get the properties of database [ Index Dividend ]
 
 conn = wrds.Connection(wrds_username='irisyu')
 
-tables_SP500      = conn.list_tables(library='crsp')
-col_headers_SP500 = conn.describe_table(library='crsp', table='dsp500')
+tables_optionm    = conn.list_tables(library='optionm_all')
+col_headers_optionm = conn.describe_table(library='optionm_all', table='idxdvd')
+
+query_optionm = text("""
+                     SELECT 
+                         secid, date, rate
+                     FROM 
+                         optionm_all.idxdvd
+                     WHERE 
+                         date BETWEEN '1996-07-01' AND '1996-07-31'
+                     AND
+                         secid = '108105'
+                     """)
+                   
+df_optionm_div = conn.raw_sql(query_optionm)
+df_optionm_div['dividend_yield'] = df_optionm_div['rate']/100
+
+df_optionm_div['date'] = pd.to_datetime(df_optionm_div['date'])
+df_optionm_div = df_optionm_div.set_index('date')
 
 
-# %%  Setting query & Load data
+Path_Input  = 'D:/Google/我的雲端硬碟/學術｜研究與論文/論文著作/CDI Method/Data/99 姿穎學姊提供/20240417/'
+IndexDivYield = pd.read_csv(os.path.join(Path_Input, 'IndexDivYield19962019.txt'), delimiter=' ', header=None)
+IndexDivYield.columns = ['SECID', 'date', 'dividend_yield']
+IndexDivYield['date'] = pd.to_datetime(IndexDivYield['date'].astype(str), format='%Y%m%d')
+IndexDivYield_july_1996 = IndexDivYield[(IndexDivYield['date'] >= '1996-07-01') & (IndexDivYield['date'] <= '1996-07-31')]
+IndexDivYield_july_1996 = IndexDivYield_july_1996.set_index('date')
+
+
+df_optionm_div['check'] = IndexDivYield_july_1996['dividend_yield']
+
+conn.close()
+                   
+                   
+# %%  Setting query & Load data [ S&P 500 Index ]
 
 query_SP500 = text("""
                    SELECT caldt, spindx

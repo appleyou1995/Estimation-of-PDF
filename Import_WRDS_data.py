@@ -3,6 +3,7 @@ import wrds
 
 import os
 import pandas as pd
+import numpy  as np
 
 
 # %%  Connect to WRDS & Get the properties of database [ Option ]
@@ -10,7 +11,7 @@ import pandas as pd
 conn = wrds.Connection(wrds_username='irisyu')
 
 libraries          = conn.list_libraries()
-tables_option      = conn.list_tables(library='optionm_all')
+tables_optionm_all = conn.list_tables(library='optionm_all')
 col_headers_option = conn.describe_table(library='optionm_all', table='opprcd2023')
 
 query_option = text("""
@@ -37,7 +38,9 @@ conn.close()
 
 conn = wrds.Connection(wrds_username='irisyu')
 
-tables_optionm    = conn.list_tables(library='optionm_all')
+tables_optionm_all
+
+# OptionMetrics - Index Dividend Yield
 col_headers_optionm = conn.describe_table(library='optionm_all', table='idxdvd')
 
 query_optionm = text("""
@@ -52,12 +55,13 @@ query_optionm = text("""
                      """)
                    
 df_optionm_div = conn.raw_sql(query_optionm)
-df_optionm_div['dividend_yield'] = df_optionm_div['rate']/100
+df_optionm_div['dividend_yield'] = df_optionm_div['rate'] / 100
 
 df_optionm_div['date'] = pd.to_datetime(df_optionm_div['date'])
 df_optionm_div = df_optionm_div.set_index('date')
 
 
+# import another data source
 Path_Input  = 'D:/Google/我的雲端硬碟/學術｜研究與論文/論文著作/CDI Method/Data/99 姿穎學姊提供/20240417/'
 IndexDivYield = pd.read_csv(os.path.join(Path_Input, 'IndexDivYield19962019.txt'), delimiter=' ', header=None)
 IndexDivYield.columns = ['SECID', 'date', 'dividend_yield']
@@ -69,9 +73,38 @@ IndexDivYield_july_1996 = IndexDivYield_july_1996.set_index('date')
 df_optionm_div['check'] = IndexDivYield_july_1996['dividend_yield']
 
 conn.close()
+
+
+# %%  Connect to WRDS & Get the properties of database [ Risk-free Rate ]
+
+conn = wrds.Connection(wrds_username='irisyu')
+
+tables_optionm_all
+
+# OptionMetrics - Zero Coupon Yield Curve
+conn.describe_table(library='optionm_all', table='zerocd')
+
+query_optionm_rate = text("""
+                          SELECT
+                              date, days, rate
+                          FROM
+                              optionm_all.zerocd
+                          WHERE 
+                              date = '1996-07-17'
+                          """)
+                          
+df_rate = conn.raw_sql(query_optionm_rate)
+df_rate['rate'] = df_rate['rate'] / 100
+
+df_rate['date'] = pd.to_datetime(df_rate['date'])
+df_rate = df_rate.set_index('date')
+
+conn.close()
                    
                    
 # %%  Setting query & Load data [ S&P 500 Index ]
+
+conn = wrds.Connection(wrds_username='irisyu')
 
 query_SP500 = text("""
                    SELECT caldt, spindx
@@ -94,7 +127,7 @@ df_19960717['strike_price'] = df_19960717['strike_price'] / 1000
 # Add S&P500 Index level
 df_19960717.insert(df_19960717.columns.get_loc('strike_price') + 1, 'spindx', spindx)
 
-# Time-to-Maturity
+# Add Weekday
 df_19960717['date'] = pd.to_datetime(df_19960717['date'])
 df_19960717['exdate'] = pd.to_datetime(df_19960717['exdate'])
 df_19960717['weekday'] = df_19960717['exdate'].dt.day_name()
@@ -102,7 +135,15 @@ df_19960717['weekday'] = df_19960717['exdate'].dt.day_name()
 # Correction of Expiration Date: Saturday to Friday
 df_19960717.loc[df_19960717['weekday'] == 'Saturday', 'exdate'] -= pd.DateOffset(days=1)
 df_19960717['weekday'] = df_19960717['exdate'].dt.day_name()
+
+# Time-to-Maturity
 df_19960717['TTM'] = (df_19960717['exdate'] - df_19960717['date']).dt.days
+
+# Add dividend yield
+df_19960717['dividend_yield'] = df_19960717['date'].map(df_optionm_div.set_index(df_optionm_div.index)['dividend_yield'])
+
+# Add risk-free rate by one-dimensional linear interpolation
+df_19960717['risk_free_rate'] = np.interp(df_19960717['TTM'], df_rate['days'], df_rate['rate'])
 
 
 # %%  Filtering
@@ -128,6 +169,11 @@ df_19960717_filter = df_19960717_filter[df_19960717_filter['keep'] == 'True']
 df_19960717_filter = df_19960717_filter.sort_values(
     by=['date', 'exdate', 'strike_price', 'spindx', 'best_bid'],
     ascending=True)
+
+# Output
+current_directory = os.getcwd()
+output_file = os.path.join(current_directory, '19960717_filter.csv')
+df_19960717_filter.to_csv(output_file, index=True)
 
 
 # %%  Double Check

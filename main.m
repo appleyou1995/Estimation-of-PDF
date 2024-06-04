@@ -478,8 +478,9 @@ try
                                           EMP_CDF_R0, EMP_PDF_R0, EMP_PDF_R1);          
 catch
 end     
-clear EMP_CDF_R0 EMP_PDF_R0 EMP_PDF_R1
-clear mu sigma k sol
+
+% clear EMP_CDF_R0 EMP_PDF_R0 EMP_PDF_R1
+% clear mu sigma k sol
 
 
 %% Risk-Neutral Density (Left-Tail Connection, Reverse Left to Right)
@@ -578,8 +579,121 @@ for n = 1:10000
     catch
     end    
 end
-clear EMP_CDF_L0 EMP_PDF_L0 EMP_PDF_L1  
-clear mu sigma k sol
+
+% clear EMP_CDF_L0 EMP_PDF_L0 EMP_PDF_L1  
+% clear mu sigma k sol
+
+
+%% Plot Figure: Right Tail
+
+GEV_Right_Tail = figure;
+
+set(gcf, 'Color', mBackground);
+
+% Risk-Neutral Density (Empirical)
+plot(Smooth_K, Smooth_EMP_PDF, ...
+     'LineWidth', 2, ...
+     'Color', mDarkRed);     
+hold on
+ 
+% Generalized Extreme Value Function (GEV, Right Tail)
+try
+    plot(Smooth_AllK, Smooth_GEV_R_PDF, ...
+         'LineWidth', 2, ...
+         'LineStyle', '--', ...
+         'Color', mLightBlue);    
+    hold on
+catch
+end
+
+set(gca,'XTick', min(Smooth_AllK):50:max(Smooth_AllK));
+xlim([450 900]);
+ylim([0 0.025]);
+xtickformat('%.0f');
+grid on
+
+h1 = title('Risk-Neutral Density and Fitted GEV Right Tail Functions');
+h2 = legend('Empirical RND', 'Right Tail GEV Function');
+h3 = xlabel('Level of S&P 500 Index');
+h4 = ylabel('Density');
+
+% Adjust the title position
+titlePosition = get(h1, 'Position');
+titlePosition(2) = titlePosition(2) + 0.0005;
+set(h1, 'Position', titlePosition);
+
+set([h1 h2 h3 h4], ...
+    'FontName', 'Fira Sans', ...
+    'FontSize', 10, ...
+    'LineWidth', 1)
+
+% Customize axes
+ax = gca;
+set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
+
+set(gcf,'InvertHardcopy','off')
+
+clear h1 h2 h3 h4
+
+% Save the figure
+saveas(GEV_Right_Tail, fullfile(currentFolder, 'Figure', 'GEV_Right_Tail.png'));
+saveas(GEV_Right_Tail, fullfile(currentFolder, 'Figure', 'GEV_Right_Tail.fig'));
+
+
+%% Plot Figure: Left Tail
+
+GEV_Left_Tail = figure;
+
+set(gcf, 'Color', mBackground);
+
+% Risk-Neutral Density (Empirical)
+plot(Smooth_K, Smooth_EMP_PDF, ...
+     'LineWidth', 2, ...
+     'Color', mDarkRed);     
+hold on 
+
+% Generalized Extreme Value Function (GEV, Left Tail)
+try
+    plot(Smooth_AllK, Smooth_GEV_L_PDF, ...
+         'LineWidth', 2, ...
+         'LineStyle', ':', ...
+         'Color', mDarkGreen);    
+    hold on
+catch
+end 
+
+set(gca,'XTick', min(Smooth_AllK):50:max(Smooth_AllK));
+xlim([450 900]);
+ylim([0 0.025]);
+xtickformat('%.0f');
+grid on
+
+h1 = title('Risk-Neutral Density and Fitted GEV Left Tail Functions');
+h2 = legend('Empirical RND', 'Left Tail GEV Function');
+h3 = xlabel('Level of S&P 500 Index');
+h4 = ylabel('Density');
+
+% Adjust the title position
+titlePosition = get(h1, 'Position');
+titlePosition(2) = titlePosition(2) + 0.0005;
+set(h1, 'Position', titlePosition);
+
+set([h1 h2 h3 h4], ...
+    'FontName', 'Fira Sans', ...
+    'FontSize', 10, ...
+    'LineWidth', 1)
+
+% Customize axes
+ax = gca;
+set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
+
+set(gcf,'InvertHardcopy','off')
+
+clear h1 h2 h3 h4
+
+% Save the figure
+saveas(GEV_Left_Tail, fullfile(currentFolder, 'Figure', 'GEV_Left_Tail.png'));
+saveas(GEV_Left_Tail, fullfile(currentFolder, 'Figure', 'GEV_Left_Tail.fig'));
 
 
 %% Plot Figure

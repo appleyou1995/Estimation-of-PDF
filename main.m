@@ -3,6 +3,8 @@ clear; clc
 
 %% Setting
 
+currentFolder = pwd;
+
 % Specific Date
 Target_Date = 19960717;
 
@@ -160,6 +162,7 @@ DY = DY * ones(size(Smooth_K));                                            % Upd
 RF = RF * ones(size(Smooth_K));                                            % Update: RF
 
 Smooth_OP = blsprice(S0, Smooth_K, RF, TTM, Smooth_IV, DY); 
+[Call, Put] = blsprice(S0, Smooth_K, RF, TTM, Smooth_IV, DY); 
 
 % clear Smooth_IV
 % clear S0 DY
@@ -218,8 +221,69 @@ set(gcf,'InvertHardcopy','off')
 clear h1 h2 h3 h4
 
 % Save the figure
-saveas(ImpliedVolatilities, 'ImpliedVolatilities.png');                    % Save as PNG image
-saveas(ImpliedVolatilities, 'ImpliedVolatilities.fig');                    % Save as MATLAB figure file
+saveas(ImpliedVolatilities, fullfile(currentFolder, 'Figure', 'ImpliedVolatilities.png'));
+saveas(ImpliedVolatilities, fullfile(currentFolder, 'Figure', 'ImpliedVolatilities.fig'));
+
+
+%% Plot Figure: Smoothed Option Price
+
+Option_Price = figure;
+
+set(gcf, 'Color', mBackground);
+
+% Customize axes
+ax = gca;
+set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
+
+S0_line = Data(1, Index_S);
+line([S0_line S0_line], [0.2 41], 'Color', mDarkRed, 'LineWidth', 1);
+hold on
+
+text(S0_line, 42, sprintf('%.2f', S0_line), 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center', 'FontSize', 11, 'FontName', 'Fira Sans Medium', 'Color', mDarkRed);
+
+plot(Smooth_K, Call, ...
+     'LineWidth', 2, ...
+     'LineStyle', '--', ...
+     'Color', mLightBlue);   
+
+plot(Smooth_K, Put, ...
+     'LineWidth', 2, ...
+     'LineStyle', ':', ...
+     'Color', mDarkGreen);  
+
+plot(Data(:, Index_K), Data(:, Index_OP_Bid), ...
+     'LineStyle', 'none', ...     
+     'LineWidth', 2, ...
+     'Marker', 'o', ...     
+     'MarkerSize', 6, ...
+     'Color', mDarkBlue); 
+
+grid on
+
+h1 = title('Option Prices via Implied Volatility Smoothing');
+h2 = legend('Spot Price', 'Call Option Price', 'Put Option Price', 'Raw Option Price Data');
+h3 = xlabel('Strike Price');
+h4 = ylabel('Option Price');
+
+% Adjust the title position
+titlePosition = get(h1, 'Position');
+titlePosition(2) = titlePosition(2) + 0.05; % Adjust this value as needed
+set(h1, 'Position', titlePosition);
+
+set([h1 h2 h3 h4], ...
+    'FontName', 'Fira Sans', ...
+    'FontSize', 10, ...
+    'LineWidth', 1)
+
+ax = gca;
+set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12, 'box', 'on');
+
+set(gcf,'InvertHardcopy','off')
+clear h1 h2 h3 h4
+
+% Save the figure
+saveas(Option_Price, fullfile(currentFolder, 'Figure', 'Option_Price.png'));
+saveas(Option_Price, fullfile(currentFolder, 'Figure', 'Option_Price.fig'));
 
 
 %% Risk-Neutral Density and Distribution (Empirical)
@@ -288,8 +352,8 @@ set(gcf,'InvertHardcopy','off')
 clear h1 h2 h3 h4
 
 % Save the figure
-saveas(Q_measure_PDF_Partial, 'Q_measure_PDF_Partial.png');
-saveas(Q_measure_PDF_Partial, 'Q_measure_PDF_Partial.fig'); 
+saveas(Q_measure_PDF_Partial, fullfile(currentFolder, 'Figure', 'Q_measure_PDF_Partial.png'));
+saveas(Q_measure_PDF_Partial, fullfile(currentFolder, 'Figure', 'Q_measure_PDF_Partial.fig')); 
 
 
 %% Plot Figure: CDF
@@ -332,8 +396,8 @@ set(gcf,'InvertHardcopy','off')
 clear h1 h2 h3 h4
 
 % Save the figure
-saveas(Q_measure_CDF, 'Q_measure_CDF.png');
-saveas(Q_measure_CDF, 'Q_measure_CDF.fig');
+saveas(Q_measure_CDF, fullfile(currentFolder, 'Figure', 'Q_measure_CDF.png'));
+saveas(Q_measure_CDF, fullfile(currentFolder, 'Figure', 'Q_measure_CDF.fig'));
 
 
 %% Risk-Neutral Density (Right-Tail Connection)
@@ -355,7 +419,7 @@ else
     K_R1 = Smooth_K(end);     
     EMP_PDF_R1 = Smooth_EMP_PDF(end);      
 end
-BP_R0 = BP_R1 - 0.03;                                                  % Update: BP_R0 
+BP_R0 = BP_R1 - 0.03;                                                      % Update: BP_R0 
 clear Index 
 
 
@@ -609,7 +673,7 @@ xlim([min(Smooth_AllK) max(Smooth_AllK)]);
 xtickformat('%.0f');
 grid on
 
-h1 = title(['Risk-Neutral Density and Fitted GEV Tail Functions']);
+h1 = title('Risk-Neutral Density and Fitted GEV Tail Functions');
 h2 = legend('Empirical RND', 'Right Tail GEV Function', 'Left Tail GEV Function', 'Connection Points');
 h3 = xlabel('Level of S&P 500 Index');
 h4 = ylabel('Density');
@@ -691,7 +755,7 @@ h4 = ylabel('Probability Density');
 
 % Adjust the title position
 titlePosition = get(h1, 'Position');
-titlePosition(2) = titlePosition(2) + 0.0005; % Adjust this value as needed
+titlePosition(2) = titlePosition(2) + 0.0005;
 set(h1, 'Position', titlePosition);
 
 set([h1 h2 h3 h4], ...
@@ -708,8 +772,8 @@ set(gcf,'InvertHardcopy','off')
 clear h1 h2 h3 h4
 
 % Save the figure
-saveas(Q_measure_PDF_Full, 'Q_measure_PDF_Full.png');
-saveas(Q_measure_PDF_Full, 'Q_measure_PDF_Full.fig');
+saveas(Q_measure_PDF_Full, fullfile(currentFolder, 'Figure', 'Q_measure_PDF_Full.png'));
+saveas(Q_measure_PDF_Full, fullfile(currentFolder, 'Figure', 'Q_measure_PDF_Full.fig'));
 
 
 %% [CARA] Constant Absolute Risk Aversion Utility Function
@@ -764,7 +828,7 @@ h4 = ylabel('Probability Density');
 
 % Adjust the title position
 titlePosition = get(h1, 'Position');
-titlePosition(2) = titlePosition(2) + 0.0005; % Adjust this value as needed
+titlePosition(2) = titlePosition(2) + 0.0005;
 set(h1, 'Position', titlePosition);
 
 set([h1 h2 h3 h4], ...
@@ -781,8 +845,8 @@ set(gcf,'InvertHardcopy','off')
 clear h1 h2 h3 h4 legendText1 legendText2 legendText3 legendText4
 
 % Save the figure
-saveas(P_measure_PDF_CARA_Full, 'P_measure_PDF_CARA_Full.png');
-saveas(P_measure_PDF_CARA_Full, 'P_measure_PDF_CARA_Full.fig');
+saveas(P_measure_PDF_CARA_Full, fullfile(currentFolder, 'Figure', 'P_measure_PDF_CARA_Full.png'));
+saveas(P_measure_PDF_CARA_Full, fullfile(currentFolder, 'Figure', 'P_measure_PDF_CARA_Full.fig'));
 
 
 %% [CARA] Plot Figure: Physical Density (Partial Density)
@@ -817,7 +881,7 @@ h4 = ylabel('Probability Density');
 
 % Adjust the title position
 titlePosition = get(h1, 'Position');
-titlePosition(2) = titlePosition(2) + 0.0002; % Adjust this value as needed
+titlePosition(2) = titlePosition(2) + 0.0002;
 set(h1, 'Position', titlePosition);
 
 set([h1 h2 h3 h4], ...
@@ -834,8 +898,8 @@ set(gcf,'InvertHardcopy','off')
 clear h1 h2 h3 h4 legendText1 legendText2 legendText3 legendText4
 
 % Save the figure
-saveas(P_measure_PDF_CARA_Partial, 'P_measure_PDF_CARA_Partial.png');
-saveas(P_measure_PDF_CARA_Partial, 'P_measure_PDF_CARA_Partial.fig');
+saveas(P_measure_PDF_CARA_Partial, fullfile(currentFolder, 'Figure', 'P_measure_PDF_CARA_Partial.png'));
+saveas(P_measure_PDF_CARA_Partial, fullfile(currentFolder, 'Figure', 'P_measure_PDF_CARA_Partial.fig'));
 
 
 %% [CARA] Plot Figure: Physical Density (Zoom-in Density)
@@ -869,7 +933,7 @@ h4 = ylabel('Probability Density');
 
 % Adjust the title position
 titlePosition = get(h1, 'Position');
-titlePosition(2) = titlePosition(2) + 0.0005; % Adjust this value as needed
+titlePosition(2) = titlePosition(2) + 0.0005;
 set(h1, 'Position', titlePosition);
 
 set([h1 h2 h3 h4], ...
@@ -882,8 +946,8 @@ ax = gca;
 set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
 
 % Add inset axes for zoomed-in plot
-inset_axes = axes('Position',[0.55 0.3 0.3 0.35]); % Adjust position and size as needed
-box on % Add a box around the inset plot
+inset_axes = axes('Position',[0.55 0.3 0.3 0.35]);
+box on
 plot(Smooth_AllK, P_Density_alpha_1, '-', 'LineWidth', 2, 'Color', mDarkGreen);
 hold on;
 plot(Smooth_AllK, P_Density_alpha_2, '-', 'LineWidth', 2, 'Color', mOrange);
@@ -895,15 +959,15 @@ xlim([620, 700]);
 ylim([0.01, 0.02]);
 grid on
 
-set(inset_axes, 'FontName', 'Fira Sans Light', 'FontSize', 8); % Customize inset axes
+set(inset_axes, 'FontName', 'Fira Sans Light', 'FontSize', 8);
 
 set(gcf,'InvertHardcopy','off')
 
 clear h1 h2 h3 h4 legendText1 legendText2 legendText3 legendText4
 
 % Save the figure
-saveas(P_measure_PDF_CARA_Zoom, 'P_measure_PDF_CARA_Zoom.png');
-saveas(P_measure_PDF_CARA_Zoom, 'P_measure_PDF_CARA_Zoom.fig');
+saveas(P_measure_PDF_CARA_Zoom, fullfile(currentFolder, 'Figure', 'P_measure_PDF_CARA_Zoom.png'));
+saveas(P_measure_PDF_CARA_Zoom, fullfile(currentFolder, 'Figure', 'P_measure_PDF_CARA_Zoom.fig'));
 
 
 %% [CRRA] Constant Relative Risk Aversion Utility Function
@@ -957,7 +1021,7 @@ h4 = ylabel('Probability Density');
 
 % Adjust the title position
 titlePosition = get(h1, 'Position');
-titlePosition(2) = titlePosition(2) + 0.0005; % Adjust this value as needed
+titlePosition(2) = titlePosition(2) + 0.0005;
 set(h1, 'Position', titlePosition);
 
 set([h1 h2 h3 h4], ...
@@ -974,8 +1038,8 @@ set(gcf,'InvertHardcopy','off')
 clear h1 h2 h3 h4 legendText1 legendText2 legendText3 legendText4
 
 % Save the figure
-saveas(P_measure_PDF_CRRA_Full, 'P_measure_PDF_CRRA_Full.png');
-saveas(P_measure_PDF_CRRA_Full, 'P_measure_PDF_CRRA_Full.fig');
+saveas(P_measure_PDF_CRRA_Full, fullfile(currentFolder, 'Figure', 'P_measure_PDF_CRRA_Full.png'));
+saveas(P_measure_PDF_CRRA_Full, fullfile(currentFolder, 'Figure', 'P_measure_PDF_CRRA_Full.fig'));
 
 
 %% [CRRA] Plot Figure: Physical Density (Partial Density)
@@ -1010,7 +1074,7 @@ h4 = ylabel('Probability Density');
 
 % Adjust the title position
 titlePosition = get(h1, 'Position');
-titlePosition(2) = titlePosition(2) + 0.0001; % Adjust this value as needed
+titlePosition(2) = titlePosition(2) + 0.0001;
 set(h1, 'Position', titlePosition);
 
 set([h1 h2 h3 h4], ...
@@ -1027,8 +1091,8 @@ set(gcf,'InvertHardcopy','off')
 clear h1 h2 h3 h4 legendText1 legendText2 legendText3 legendText4
 
 % Save the figure
-saveas(P_measure_PDF_CRRA_Partial, 'P_measure_PDF_CRRA_Partial.png');
-saveas(P_measure_PDF_CRRA_Partial, 'P_measure_PDF_CRRA_Partial.fig');
+saveas(P_measure_PDF_CRRA_Partial, fullfile(currentFolder, 'Figure', 'P_measure_PDF_CRRA_Partial.png'));
+saveas(P_measure_PDF_CRRA_Partial, fullfile(currentFolder, 'Figure', 'P_measure_PDF_CRRA_Partial.fig'));
 
 
 %% [CRRA] Plot Figure: Physical Density (Zoom-in Density)
@@ -1062,7 +1126,7 @@ h4 = ylabel('Probability Density');
 
 % Adjust the title position
 titlePosition = get(h1, 'Position');
-titlePosition(2) = titlePosition(2) + 0.0005; % Adjust this value as needed
+titlePosition(2) = titlePosition(2) + 0.0005;
 set(h1, 'Position', titlePosition);
 
 set([h1 h2 h3 h4], ...
@@ -1075,8 +1139,8 @@ ax = gca;
 set(ax, 'FontName', 'Fira Sans Light', 'FontSize', 12);
 
 % Add inset axes for zoomed-in plot
-inset_axes = axes('Position',[0.55 0.3 0.3 0.35]); % Adjust position and size as needed
-box on % Add a box around the inset plot
+inset_axes = axes('Position',[0.55 0.3 0.3 0.35]);
+box on
 plot(Smooth_AllK, P_Density_gamma_1, '-', 'LineWidth', 2, 'Color', mDarkGreen);
 hold on;
 plot(Smooth_AllK, P_Density_gamma_2, '-', 'LineWidth', 2, 'Color', mOrange);
@@ -1088,15 +1152,15 @@ xlim([630, 670]);
 ylim([0.014, 0.017]);
 grid on
 
-set(inset_axes, 'FontName', 'Fira Sans Light', 'FontSize', 8); % Customize inset axes
+set(inset_axes, 'FontName', 'Fira Sans Light', 'FontSize', 8);
 
 set(gcf,'InvertHardcopy','off')
 
 clear h1 h2 h3 h4 legendText1 legendText2 legendText3 legendText4
 
 % Save the figure
-saveas(P_measure_PDF_CRRA_Zoom, 'P_measure_PDF_CRRA_Zoom.png');
-saveas(P_measure_PDF_CRRA_Zoom, 'P_measure_PDF_CRRA_Zoom.fig');
+saveas(P_measure_PDF_CRRA_Zoom, fullfile(currentFolder, 'Figure', 'P_measure_PDF_CRRA_Zoom.png'));
+saveas(P_measure_PDF_CRRA_Zoom, fullfile(currentFolder, 'Figure', 'P_measure_PDF_CRRA_Zoom.fig'));
 
 
 %% Calculate Statistical Moments of Return
@@ -1192,7 +1256,7 @@ Summary_table = table(...
 
 disp(Summary_table);
 
-writetable(Summary_table, 'Summary_table.csv', 'WriteRowNames', true);
+writetable(Summary_table, fullfile(currentFolder, 'Table', 'Summary_table.csv'), 'WriteRowNames', true);
 
 
 %%    Summary
@@ -1208,8 +1272,10 @@ Summary_table_T = table(...
     [gamma_3_mean; gamma_3_variance; gamma_3_skewness; gamma_3_kurtosis], ...
     [gamma_4_mean; gamma_4_variance; gamma_4_skewness; gamma_4_kurtosis], ...
     'RowNames', {'Mean', 'Variance', 'Skewness', 'Kurtosis'}, ...
-    'VariableNames', {'RND', 'alpha = 0.01', 'alpha = 0.02', 'alpha = 0.03', 'alpha = 0.04', 'gamma = 1', 'gamma = 2', 'gamma = 3', 'gamma = 4'});
+    'VariableNames', {'RND', ...
+                      'alpha = 0.01', 'alpha = 0.02', 'alpha = 0.03', 'alpha = 0.04', ...
+                      'gamma = 1',    'gamma = 2',    'gamma = 3',    'gamma = 4'});
 
 disp(Summary_table_T);
 
-writetable(Summary_table_T, 'Summary_table_T.csv', 'WriteRowNames', true);
+writetable(Summary_table_T, fullfile(currentFolder, 'Table', 'Summary_table_T.csv'), 'WriteRowNames', true);

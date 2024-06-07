@@ -144,7 +144,7 @@ Smooth_AllK = K_Low:0.05:K_High;
 
 %% Spline Approximation (Empirical)
 
-% Fourth-Order Spline Approximation  
+% Fourth-Order Spline Approximation
 LSS = spap2(1, 4, Data(:, Index_K), Data(:, Index_IV));
 
 
@@ -1393,3 +1393,9 @@ Summary_table_T = table(...
 disp(Summary_table_T);
 
 writetable(Summary_table_T, fullfile(currentFolder, 'Table', 'Summary_table_T.csv'), 'WriteRowNames', true);
+
+
+%% Check
+
+Div = Data(1, Index_DY);
+theoretical_value = exp((RF - Div) * (Target_TTM / 365));
